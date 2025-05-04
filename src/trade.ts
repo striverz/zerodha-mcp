@@ -7,10 +7,9 @@ const accessToken = process.env.ZERODHA_ACCESS_TOKEN as string;
 const kc = new KiteConnect({ api_key: apiKey });
 kc.setAccessToken(accessToken);
 
-console.log(kc.getLoginURL());
-export async function main() {
+export async function getProfile() {
   try {
-    const profile = await getProfile();
+    const profile = await kc.getProfile();
     return profile;
   } catch (err) {
     console.error(err);
@@ -18,12 +17,21 @@ export async function main() {
   }
 }
 
-async function getProfile() {
+export async function placeOrder(
+  tradingsymbol: string,
+  quantity: number,
+  type: "BUY" | "SELL"
+) {
   try {
-    const profile = await kc.getProfile();
-    return profile;
+    await kc.placeOrder("regular", {
+      exchange: "BSE",
+      tradingsymbol,
+      transaction_type: type,
+      quantity,
+      product: "CNC",
+      order_type: "MARKET",
+    });
   } catch (err) {
-    console.error("Error getting profile:", err);
-    return null;
+    console.log(err);
   }
 }

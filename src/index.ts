@@ -1,4 +1,4 @@
-import { main } from "./trade";
+import { getProfile, placeOrder } from "./trade";
 import dotenv from "dotenv";
 import {
   McpServer,
@@ -14,7 +14,7 @@ const server = new McpServer({
 });
 
 server.tool("get-my-data", {}, async () => {
-  const profile = await main();
+  const profile = await getProfile();
   console.log(profile);
 
   return {
@@ -27,9 +27,38 @@ server.tool("get-my-data", {}, async () => {
   };
 });
 
+server.tool(
+  "buy-a-stock",
+  { stock: z.string(), quantity: z.number() },
+  async ({ stock, quantity }) => {
+    placeOrder(stock, quantity, "BUY");
+    return {
+      content: [
+        {
+          type: "text",
+          text: "Stock Executed!",
+        },
+      ],
+    };
+  }
+);
+server.tool(
+  "sell-a-stock",
+  { stock: z.string(), quantity: z.number() },
+  async ({ stock, quantity }) => {
+    placeOrder(stock, quantity, "SELL");
+    return {
+      content: [
+        {
+          type: "text",
+          text: "Stock Executed!",
+        },
+      ],
+    };
+  }
+);
+
 async function start() {
-  const data = await main();
-  console.log(data);
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
